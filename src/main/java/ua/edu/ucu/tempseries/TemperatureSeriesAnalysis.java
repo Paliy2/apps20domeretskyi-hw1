@@ -1,52 +1,160 @@
 package ua.edu.ucu.tempseries;
 
+import java.util.InputMismatchException;
+
 public class TemperatureSeriesAnalysis {
+    static int MIN_TEMPERATURE = -273;
 
-    public TemperatureSeriesAnalysis() {
+    private double[] temperatureArray;
+    private int temperatureArrayCapacity;
+    private int currentTemperaturesNumber;
 
+    TemperatureSeriesAnalysis() {
+        temperatureArray = new double[1];
+        temperatureArrayCapacity = 1;
+        currentTemperaturesNumber = 0;
     }
 
-    public TemperatureSeriesAnalysis(double[] temperatureSeries) {
-
+    TemperatureSeriesAnalysis(double[] temperatureSeries) {
+        this();
+        addTemps(temperatureSeries);
     }
 
-    public double average() {
-        return -1;
+    double average() {
+        if (currentTemperaturesNumber == 0) {
+            throw new IllegalArgumentException();
+        }
+
+        double averageTemp = 0;
+        for (int i = 0; i < currentTemperaturesNumber; i++) {
+            averageTemp += temperatureArray[i];
+        }
+        averageTemp /= currentTemperaturesNumber;
+        return averageTemp;
     }
 
-    public double deviation() {
-        return 0;
+
+    double deviation() {
+        double deviation = 0;
+        double average = average();
+
+        for (int i = 0; i < currentTemperaturesNumber; i++) {
+            deviation += Math.pow(Math.abs(temperatureArray[i] - average), 2);
+        }
+
+        deviation /= currentTemperaturesNumber;
+        return deviation;
     }
 
-    public double min() {
-        return 0;
+    double min() {
+        if (currentTemperaturesNumber == 0) {
+            throw new IllegalArgumentException();
+        }
+
+        double min = temperatureArray[0];
+        for (int i = 1; i < currentTemperaturesNumber; i++) {
+            if (temperatureArray[i] < min) {
+                min = temperatureArray[i];
+            }
+        }
+        return min;
     }
 
-    public double max() {
-        return 0;
+    double max() {
+        if (currentTemperaturesNumber == 0) {
+            throw new IllegalArgumentException();
+        }
+
+        double max = temperatureArray[0];
+        for (int i = 1; i < currentTemperaturesNumber; i++) {
+            if (temperatureArray[i] > max) {
+                max = temperatureArray[i];
+            }
+        }
+        return max;
     }
 
-    public double findTempClosestToZero() {
-        return 0;
+    double findTempClosestToZero() {
+        return findTempClosestToValue(0.0);
     }
 
-    public double findTempClosestToValue(double tempValue) {
-        return 0;
+    double findTempClosestToValue(double tempValue) {
+        if (currentTemperaturesNumber == 0) {
+            throw new IllegalArgumentException();
+        }
+
+        double currentClosest = temperatureArray[0];
+        double dist = Math.abs(currentClosest - tempValue);
+
+        for (int i = 1; i < currentTemperaturesNumber; i++) {
+            if (dist > Math.abs(temperatureArray[i] - tempValue)) {
+                currentClosest = temperatureArray[i];
+                dist = Math.abs(currentClosest - tempValue);
+            } else if (Math.abs(currentClosest) == Math.abs(temperatureArray[i]) && temperatureArray[i] > currentClosest) {
+                currentClosest = temperatureArray[i];
+                dist = Math.abs(currentClosest - tempValue);
+            }
+        }
+        return currentClosest;
     }
 
-    public double[] findTempsLessThen(double tempValue) {
-        return null;
+
+    double[] findTempsLessThan(double tempValue) {
+        TemperatureSeriesAnalysis smaller = new TemperatureSeriesAnalysis();
+
+        for (int i = 0; i < currentTemperaturesNumber; i++) {
+            if (temperatureArray[i] < tempValue) {
+                smaller.addOneTemp(temperatureArray[i]);
+            }
+        }
+        double[] res = new double[smaller.currentTemperaturesNumber];
+        System.arraycopy(smaller.temperatureArray, 0, res, 0, res.length);
+        return res;
     }
 
-    public double[] findTempsGreaterThen(double tempValue) {
-        return null;
+    double[] findTempsGreaterThan(double tempValue) {
+        TemperatureSeriesAnalysis bigger = new TemperatureSeriesAnalysis();
+
+        for (int i = 0; i < currentTemperaturesNumber; i++) {
+            if (temperatureArray[i] > tempValue) {
+                bigger.addOneTemp(temperatureArray[i]);
+            }
+        }
+        double[] res = new double[bigger.currentTemperaturesNumber];
+        System.arraycopy(bigger.temperatureArray, 0, res, 0, res.length);
+        return res;
     }
 
-    public TempSummaryStatistics summaryStatistics() {
-        return null;
+    private void addOneTemp(double temp) {
+        if (temperatureArrayCapacity == currentTemperaturesNumber) {
+            double[] newTempsArr = new double[temperatureArrayCapacity * 2];
+            System.arraycopy(temperatureArray, 0, newTempsArr, 0, currentTemperaturesNumber);
+            temperatureArrayCapacity *= 2;
+            temperatureArray = newTempsArr;
+        }
+        temperatureArray[currentTemperaturesNumber] = temp;
+        currentTemperaturesNumber++;
     }
 
-    public int addTemps(double... temps) {
-        return 0;
+    TempSummaryStatistics summaryStatistics() {
+        return new TempSummaryStatistics(
+                average(),
+                deviation(),
+                min(),
+                max());
+    }
+
+
+    int addTemps(double... temps) {
+        for (double temp : temps) {
+            if (temp < MIN_TEMPERATURE) {
+                throw new InputMismatchException();
+            }
+        }
+
+        for (double temp : temps) {
+            addOneTemp(temp);
+        }
+        return currentTemperaturesNumber;
     }
 }
