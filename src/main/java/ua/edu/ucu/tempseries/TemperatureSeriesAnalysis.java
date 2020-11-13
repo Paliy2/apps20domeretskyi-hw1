@@ -3,7 +3,7 @@ package ua.edu.ucu.tempseries;
 import java.util.InputMismatchException;
 
 public class TemperatureSeriesAnalysis {
-    static int MIN_TEMPERATURE = -273;
+    private static final int MIN_TEMPERATURE = -273;
 
     private double[] temperatureArray;
     private int temperatureArrayCapacity;
@@ -18,6 +18,10 @@ public class TemperatureSeriesAnalysis {
     TemperatureSeriesAnalysis(double[] temperatureSeries) {
         this();
         addTemps(temperatureSeries);
+    }
+
+    public static int getMinTemperature() {
+        return MIN_TEMPERATURE;
     }
 
     double average() {
@@ -39,7 +43,8 @@ public class TemperatureSeriesAnalysis {
         double average = average();
 
         for (int i = 0; i < currentTemperaturesNumber; i++) {
-            deviation += Math.pow(Math.abs(temperatureArray[i] - average), 2);
+            deviation += Math.abs(temperatureArray[i] - average) *
+                    Math.abs(temperatureArray[i] - average);
         }
 
         deviation /= currentTemperaturesNumber;
@@ -90,7 +95,8 @@ public class TemperatureSeriesAnalysis {
             if (dist > Math.abs(temperatureArray[i] - tempValue)) {
                 currentClosest = temperatureArray[i];
                 dist = Math.abs(currentClosest - tempValue);
-            } else if (Math.abs(currentClosest) == Math.abs(temperatureArray[i]) && temperatureArray[i] > currentClosest) {
+            } else if (Math.abs(currentClosest) ==
+                    Math.abs(temperatureArray[i]) && temperatureArray[i] > currentClosest) {
                 currentClosest = temperatureArray[i];
                 dist = Math.abs(currentClosest - tempValue);
             }
@@ -128,7 +134,8 @@ public class TemperatureSeriesAnalysis {
     private void addOneTemp(double temp) {
         if (temperatureArrayCapacity == currentTemperaturesNumber) {
             double[] newTempsArr = new double[temperatureArrayCapacity * 2];
-            System.arraycopy(temperatureArray, 0, newTempsArr, 0, currentTemperaturesNumber);
+            System.arraycopy(temperatureArray,
+                    0, newTempsArr, 0, currentTemperaturesNumber);
             temperatureArrayCapacity *= 2;
             temperatureArray = newTempsArr;
         }
