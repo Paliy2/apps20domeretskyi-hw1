@@ -85,6 +85,7 @@ public class TemperatureSeriesAnalysisTest {
     @Test
     public void testClosestToValueOneClosestElement() {
         assertEquals(13.0, tempSeries.findTempClosestToValue(10.0), 0.0);
+        assertEquals(37.7, repeatedElementsSeries.findTempClosestToValue(-10.0), 0.0);
     }
 
     @Test
@@ -172,4 +173,35 @@ public class TemperatureSeriesAnalysisTest {
 
         assertEquals(expected, actualResult, 0.00001);
     }
+
+    @Test
+    public void testTempSummaryStatistics() {
+        double expectedAvgTemp = 10;
+        double expectedDevTemp = 10;
+        double expectedMinTemp = 0;
+        double expectedMaxTemp = 20;
+        TempSummaryStatistics summaryStatistics = new TempSummaryStatistics(10,
+                10, 0, 20);
+        assertEquals(expectedAvgTemp, summaryStatistics.getAvgTemp(), 0.0);
+        assertEquals(expectedDevTemp, summaryStatistics.getDevTemp(), 0.0);
+        assertEquals(expectedMinTemp, summaryStatistics.getMinTemp(), 0.0);
+        assertEquals(expectedMaxTemp, summaryStatistics.getMaxTemp(), 0.0);
+    }
+
+    @Test
+    public void testGetMinTemperature() {
+        assertEquals(-273.0, repeatedElementsSeries.getMinTemperature(), 0.0);
+        assertEquals(-273.0, tempSeries.getMinTemperature(), 0.0);
+    }
+
+    @Test
+    public void testSummaryStatistics() {
+        TempSummaryStatistics summaryStatistics = new TempSummaryStatistics(tempSeries.average(),
+                tempSeries.deviation(), tempSeries.min(), tempSeries.max());
+        assertEquals(tempSeries.average(), summaryStatistics.getAvgTemp(), 0.1);
+        assertEquals(tempSeries.deviation(), summaryStatistics.getDevTemp(), 0.1);
+        assertEquals(tempSeries.min(), summaryStatistics.getMinTemp(), 0.1);
+        assertEquals(tempSeries.max(), summaryStatistics.getMaxTemp(), 0.1);
+    }
 }
+
