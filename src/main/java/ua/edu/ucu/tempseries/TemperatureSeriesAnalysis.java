@@ -96,7 +96,8 @@ public class TemperatureSeriesAnalysis {
                 currentClosest = temperatureArray[i];
                 dist = Math.abs(currentClosest - tempValue);
             } else if (Math.abs(currentClosest) ==
-                    Math.abs(temperatureArray[i]) && temperatureArray[i] > currentClosest) {
+                    Math.abs(temperatureArray[i])
+                    && temperatureArray[i] > currentClosest) {
                 currentClosest = temperatureArray[i];
                 dist = Math.abs(currentClosest - tempValue);
             }
